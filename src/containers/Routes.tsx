@@ -1,24 +1,57 @@
-import React from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect, RouteProps } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { Switch, Route, Redirect, RouteProps } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { RootStore } from "../stores/rootStore";
+import { setTitle } from "../stores/titleStore";
 import Home from "../pages/Home";
 import Auth from "../pages/Auth";
 import Registration from "../pages/Registration";
 
-function PrivateRoute({ children, ...rest }: RouteProps) {
+interface CustomRouteProps extends RouteProps {
+  title: string;
+  isPrivate: boolean;
+}
+
+const routes = [
+  {
+    component: Registration,
+    path: "/registration",
+    title: "Регистрация",
+    private: false,
+  },
+  {
+    component: Auth,
+    path: "/auth",
+    title: "Авторизация",
+    private: false,
+  },
+  {
+    component: Home,
+    path: "/",
+    title: "Главная станица",
+    private: true,
+  },
+];
+
+function CustomRoute({ isPrivate, title, children, ...rest }: CustomRouteProps) {
   const userStore = useSelector((store: RootStore) => store.userStore);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setTitle(title));
+    document.title = title;
+  }, [dispatch, title]);
 
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        userStore.isAuth ? (
+        (isPrivate ? userStore.isAuth : !userStore.isAuth) ? (
           children
         ) : (
           <Redirect
             to={{
-              pathname: "/auth",
+              pathname: isPrivate ? "/auth" : "/",
               state: { from: location },
             }}
           />
@@ -28,44 +61,16 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
   );
 }
 
-function OnlyPublicRoute({ children, ...rest }: RouteProps) {
-  const userStore = useSelector((store: RootStore) => store.userStore);
-
+function Routes() {
   return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        !userStore.isAuth ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/",
-              state: { from: location },
-            }}
-          />
-        )
-      }
-    />
+    <Switch>
+      {routes.map((route, key) => (
+        <CustomRoute isPrivate={route.private} title={route.title} key={key} path={route.path}>
+          {route.component()}
+        </CustomRoute>
+      ))}
+    </Switch>
   );
 }
 
-function RoutesContainer() {
-  return (
-    <Router>
-      <Switch>
-        <OnlyPublicRoute path="/auth">
-          <Auth />
-        </OnlyPublicRoute>
-        <OnlyPublicRoute path="/registration">
-          <Registration />
-        </OnlyPublicRoute>
-        <PrivateRoute path="/">
-          <Home />
-        </PrivateRoute>
-      </Switch>
-    </Router>
-  );
-}
-
-export default RoutesContainer;
+export default Routes;
