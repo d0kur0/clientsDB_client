@@ -1,59 +1,14 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import PageTitle from "../components/PageTitle";
 import NavBar from "../components/NavBar";
-import { useSelector } from "react-redux";
-import { RootStore } from "../stores/rootStore";
-
-const GlobalStyles = createGlobalStyle`
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: "Gilroy", sans-serif;
-    font-size: 0.9em;
-    margin: auto;
-    background-color: #fff;
-    color: #1f1f1f;
-    
-    --navbar-height: 50px;
-    --title-height: 50px;
-    --based-padding: 15px;
-  }
-  
-  a, button { 
-    color: #269AFF;
-    transition: 0.3s;
-  }
-  
-  a:hover, button:hover {
-    color: #3d81c2;
-  }
-  
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #67adff;
-    border-radius: 5px;
-    transition: 0.3s;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #1e73c6;
-  }
-`;
+import { useWindowSize } from "@react-hook/window-size";
 
 const RootArea = styled.div`
   display: grid;
-  height: 100vh;
+  height: 100vh; /* Fallback for browsers that do not support Custom Properties */
+  height: calc(var(--vh, 1vh) * 100);
   grid-template-columns: var(--navbar-height) 1fr;
   grid-template-rows: var(--title-height);
   grid-template-areas:
@@ -62,6 +17,7 @@ const RootArea = styled.div`
 
   @media (max-width: 720px) {
     grid-template-columns: auto;
+    grid-template-rows: var(--title-height) 1fr var(--navbar-height);
     grid-template-areas:
       "title"
       "content"
@@ -77,7 +33,6 @@ const NavBarWrapper = styled.header`
 `;
 
 const ContentWrapper = styled.main`
-  background-color: #f5f5f5;
   grid-area: content;
   padding: var(--based-padding);
   overflow-y: scroll;
@@ -96,12 +51,16 @@ export type layoutProps = {
 };
 
 function Layout(props: layoutProps) {
-  const userStore = useSelector((store: RootStore) => store.userStore);
+  const [width, height] = useWindowSize();
+
+  useEffect(() => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+  }, [width, height]);
 
   return (
     <Router>
       <RootArea>
-        <GlobalStyles />
         <PageTitleWrapper>
           <PageTitle />
         </PageTitleWrapper>
