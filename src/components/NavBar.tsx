@@ -30,6 +30,8 @@ const List = styled.ul`
     flex-direction: row;
     margin: 0;
     font-size: 1.6em;
+    width: 100%;
+    justify-content: space-evenly;
 
     li {
       width: 60px;
@@ -37,6 +39,7 @@ const List = styled.ul`
       align-items: center;
       justify-content: center;
       margin: 0;
+      padding-bottom: 15px;
     }
   }
 `;
@@ -81,7 +84,17 @@ const Link = styled(RouterLink)`
   }
 
   @media (max-width: 720px) {
-    &::after,
+    &::after {
+      opacity: 1;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: transparent;
+      color: #555;
+      font-size: 0.5em;
+      font-weight: bolder;
+    }
+
     &::before {
       display: none;
     }
@@ -114,7 +127,7 @@ function PublicButtons() {
   return (
     <React.Fragment>
       <li>
-        <Link data-hint="Авторизация" to="/auth">
+        <Link data-hint="Войти" to="/auth">
           <FaSignInAlt />
         </Link>
       </li>
