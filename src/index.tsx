@@ -3,14 +3,16 @@ import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { store } from "./stores/rootStore";
-import Layout from "./containers/Layout";
 import Routes from "./containers/Routes";
+import Router from "./containers/Router";
+import { GlobalStyles } from "./components/GlobalStyles";
 
 ReactDOM.render(
   <Provider store={store}>
-    <Layout>
+    <GlobalStyles />
+    <Router>
       <Routes />
-    </Layout>
+    </Router>
   </Provider>,
   document.getElementById("root"),
 );
