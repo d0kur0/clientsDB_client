@@ -20,6 +20,7 @@ const TitleLeft = styled.div`
   align-items: center;
   color: #0094ff;
   font-size: 1.2em;
+  font-weight: bolder;
 
   & > svg {
     padding-right: 5px;
